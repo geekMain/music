@@ -43,6 +43,11 @@
 
 ## 安装运行
 ```shell
+$ git clone https://github.com/Binaryify/NeteaseCloudMusicApi
+$ cd NeteaseCloudMusicApi
+$ npm install
+$ npm start
+$ 成功后访问localhost:3000是否正常，正常下一步
 $ git clone git@gitee.com:lxhcool/desktop-nicemusic.git
 $ cd desktop-nicemusic
 $ npm install
