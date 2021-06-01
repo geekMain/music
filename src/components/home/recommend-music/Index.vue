@@ -47,6 +47,7 @@ export default {
         this.songs = this._normalizeSongs(res.songs)
         console.log(this.songs)
       } catch (error) {
+        console.log(error)
       }
     },
     // 处理歌曲
@@ -71,6 +72,7 @@ export default {
 
 <style lang="stylus" scoped>
 .recommend-music {
+  margin-top: 20px;
   .title {
     margin: 0 0 15px 0;
   }

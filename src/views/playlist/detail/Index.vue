@@ -188,9 +188,8 @@ export default {
       let timestamp = new Date().valueOf()
       try {
         let res = await this.$api.getPlayListDetail(id, s, timestamp)
-        console.log(res)
         if (res.code === 200) {
-          if(res.playlist.description !== null) {
+          if (res.playlist.description !== null) {
             res.playlist.description = res.playlist.description.replace(
               /(\r\n|\n|\r)/gm,
               '<br />'

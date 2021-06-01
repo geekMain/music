@@ -1,13 +1,24 @@
 <template>
   <div class="list">
-    <div class="item" v-for="(item, index) of songList" :key="item.id" :class="
-            index == currentIndex && currentSong.id == item.id && playing
-              ? 'playing'
-              : ''
-          ">
-      <div class="wrapper flex-center shadow">
+    <div
+      class="item"
+      v-for="(item, index) of songList"
+      :key="item.id"
+      :class="
+        index == currentIndex && currentSong.id == item.id && playing
+          ? 'playing'
+          : ''
+      "
+    >
+      <div class="wrapper flex-center">
         <div class="index-container flex-center">
-          <span class="num">{{ utils.formatZero(index + 1, 2) }}</span>
+          <div class="avatar">
+            <img
+              class="avatar-img"
+              :src="item.image + '?param=150y150'"
+              alt=""
+            />
+          </div>
           <div class="play-icon">
             <div class="line" style="animation-delay: -1.2s;"></div>
             <div class="line"></div>
@@ -24,31 +35,12 @@
             @click="pauseSong(item, index)"
           ></i>
         </div>
-        <div class="avatar">
-          <el-image
-            :key="item.image + '?param=150y150'"
-            :src="item.image + '?param=150y150'"
-            lazy
-          >
-            <div slot="placeholder" class="image-slot flex-center flex-column">
-              <i class="iconfont niceicon-3"></i>
-              <p>加载中<span class="dot">...</span></p>
-            </div>
-            <div slot="error" class="image-slot flex-center">
-              <i class="el-icon-picture-outline"></i>
-            </div>
-          </el-image>
-          <div class="layer flex-center">
-            <i class="iconfont niceicon-9"></i>
-          </div>
-        </div>
         <div class="info">
           <p class="name ellipsis">{{ item.name }}</p>
-          <p class="flex-row ellipsis">
-            <span>{{ item.singer }}</span>
+          <p class="author flex-row ellipsis">
+            <span class="ellipsis">{{ item.singer }}</span>
           </p>
         </div>
-        <p class="album">《{{ item.album }}》</p>
         <p class="duration transition">
           {{ utils.formatSecondTime(item.duration) }}
         </p>
@@ -71,7 +63,7 @@ export default {
   },
   components: {},
   computed: {
-    ...mapGetters(['currentIndex', 'playing', 'currentSong']),
+    ...mapGetters(['currentIndex', 'playing', 'currentSong'])
   },
   watch: {},
   methods: {
@@ -111,38 +103,45 @@ export default {
     padding: 0 15px 30px;
     .wrapper {
       width: 100%;
-      height: 80px;
-      background-color: #ffffff;
+      height: 70px;
       justify-content: start;
-      padding: 0 4%;
+      padding-right: 2%;
       border-radius: 5px;
       position: relative;
-      .bg {
-        width: 100%;
-        height: 80%
-        position: absolute;
-        background-repeat: no-repeat;
-        background-size: cover;
-        top: 50%;
-        left: 0;
-        margin: -32px 0 0 0;
-        opacity: 0.08;
-        filter: blur(10px);
-        z-index: -1;
-      }
       .index-container {
-        width: 30px;
+        width: 70px;
         margin-right: 20px;
-        .num {
-          font-size: 15px;
-          color: #4a4a4a;
-          font-weight: bold;
+        position: relative;
+        .avatar {
+          width: 70px;
+          height: 70px;
+          position: absolute;
+          border-radius: 4px;
+          img {
+            width: 100%;
+            height: 100%;
+            border-radius: 4px;
+          }
+          &::after {
+            content: "";
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            background: rgba(0,0,0,0);
+            -webkit-transition: all 0.15s;
+            transition: all 0.15s;
+            border-radius: 4px;
+          }
         }
         .play-icon {
           display: none;
           height: 16px;
           min-width: 18px;
           overflow: hidden;
+          position: relative;
+          z-index: 1;
           .line {
             width: 2px;
             height: 100%;
@@ -157,6 +156,7 @@ export default {
           display: none;
           text-align: left;
           cursor: pointer;
+          position: relative;
         }
         .pause-btn {
           color: $color-theme;
@@ -164,37 +164,11 @@ export default {
           display: none;
           text-align: left;
           cursor: pointer;
-        }
-      }
-      .avatar {
-        width: 55px;
-        height: 55px;
-        border-radius: 5px;
-        position: relative;
-        margin-right: 30px;
-        img {
-          width: 100%;
-          height: 100%;
-          border-radius: 5px;
-        }
-        .layer {
-          width: 100%;
-          height: 100%;
-          position: absolute;
-          top: 0;
-          left: 0;
-          background: rgba(0, 0, 0, 0.6);
-          border-radius: 5px;
-          opacity: 0;
-          i {
-            color: #ffffff;
-            font-size: 26px;
-            font-weight: 100;
-          }
+          position: relative;
         }
       }
       .info {
-        width: 15%;
+        flex: 1;
         .name {
           font-size: 14px;
           color: #333333;
@@ -215,13 +189,10 @@ export default {
             }
           }
         }
-      }
-      .album {
-        font-size: 14px;
-        color: #333333;
-        font-weight: bold;
-        margin-left: 80px;
-        flex: 1;
+        span {
+          font-weight: 400;
+          white-space: break-spaces;
+        }
       }
       .duration {
         font-size: 14px;
@@ -269,8 +240,10 @@ export default {
     }
     &:hover {
       .index-container {
-        .num {
-          display: none;
+        .avatar {
+          &::after {
+            background: rgba(0, 0, 0, 0.5);
+          }
         }
         .play-btn {
           display: block;

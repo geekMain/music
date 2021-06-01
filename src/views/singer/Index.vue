@@ -215,7 +215,7 @@ export default {
     li {
       width: 28px;
       height: 28px;
-      margin-right: 14px;
+      margin-right: 12px;
       text-align: center;
       line-height: 29px;
       border-radius: 50%;

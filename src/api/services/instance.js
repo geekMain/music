@@ -2,7 +2,7 @@ import axios from 'axios'
 import qs from 'qs'
 import config from '../config'
 import router from '@/router'
-import {Message} from 'element-ui'
+import { Message } from 'element-ui'
 const { api_base_url } = config
 
 let instance = axios.create({
@@ -27,29 +27,33 @@ instance.interceptors.request.use(
     return config
   },
   error => {
-    Message.error({message: '请求超时!'});
+    Message.error({ message: '请求超时!' })
     return Promise.reject(error)
   }
 )
 
 // 响应拦截器即异常处理
-instance.interceptors.response.use(response => {
-  let data = response.data
-  let status = response.status
-  console.log(status)
-  if (status === 200) {
-    return Promise.resolve(data)
-  } else if (status === 301) {
-    Message.error({message: '请先登录!'})
-    router.replace({
-      path: 'login'
-    })
-    return
-  } else {
-    return Promise.reject(response)
+instance.interceptors.response.use(
+  response => {
+    let data = response.data
+    let status = response.status
+    console.log(status)
+    if (status === 200) {
+      return Promise.resolve(data)
+    } else if (status === 301) {
+      Message.error({ message: '请先登录!' })
+      router.replace({
+        path: 'login'
+      })
+      return
+    } else {
+      return Promise.reject(response)
+    }
+  },
+  error => {
+    console.log(error)
   }
-}, error => {
-})
+)
 
 let ajaxMethod = ['get', 'post']
 let api = {}

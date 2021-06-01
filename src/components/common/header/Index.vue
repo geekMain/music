@@ -1,5 +1,5 @@
 <template>
-  <div class="header shadow">
+  <div class="header">
     <div class="container flex-row">
       <div class="logo">
         <router-link :to="{ name: 'home' }" tag="a"></router-link>
@@ -44,15 +44,17 @@
               <el-dropdown-item icon="el-icon-setting"
                 >个人设置</el-dropdown-item
               >
-              <el-dropdown-item divided icon="el-icon-switch-button">
+              <el-dropdown-item
+                divided
+                icon="el-icon-switch-button"
+                command="logout"
+              >
                 退出登录
               </el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
-        <div class="no-login flex-row" @click="login" v-else>
-          登录
-        </div>
+        <div class="no-login flex-row" @click="login" v-else>登录</div>
       </div>
       <div class="search-wrap" :class="[searchOpenClass, searchCloseClass]">
         <div class="overlay" @click="closeSearchPop"></div>
@@ -80,7 +82,13 @@
               </div>
               <ul class="tags">
                 <li v-for="item of searchHistory" :key="item">
-                  <a class="btn flex-row" @click="tag(item)">{{ item }} <span class="close-dark" @click.stop="deleteItem(item)"></span></a>
+                  <a class="btn flex-row" @click="tag(item)"
+                    >{{ item }}
+                    <span
+                      class="close-dark"
+                      @click.stop="deleteItem(item)"
+                    ></span
+                  ></a>
                 </li>
               </ul>
             </div>
@@ -185,11 +193,27 @@ export default {
         name: 'login'
       })
     },
-    handleCommand(command) {
-      if (command == 'personal') {
-        this.$router.push({
-          name: 'personal'
-        })
+    async handleCommand(command) {
+      switch (command) {
+        case 'personal':
+          this.$router.push({
+            name: 'personal'
+          })
+          break
+        case 'logout':
+          var res = await this.$api.logout()
+          console.log(res)
+          if (res.code === 200) {
+            this.$router.push({
+              name: 'login'
+            })
+            localStorage.setItem('loginStatu', false)
+            localStorage.setItem('token', '')
+            localStorage.setItem('userInfo', '')
+          }
+          break
+        default:
+          break
       }
     },
     ...mapActions([
@@ -209,7 +233,7 @@ export default {
 <style lang="stylus" scoped>
 .header {
   width: 100%;
-  height: 70px;
+  height: 64px;
   transition: all 400ms ease-in-out;
   background-color: #fff;
   position: fixed;
@@ -217,37 +241,45 @@ export default {
   left: 0;
   right: 0;
   z-index: 2000;
+
   .logo {
     width: 146px;
     display: flex;
     align-items: center;
     margin-right: 30px;
+
     a {
       width: 100%;
       display: block;
-      height: 70px;
+      height: 64px;
       background-position: 0px center;
       background-repeat: no-repeat;
       background-size: 146px 26px;
-      background-image: url(../../../assets/images/logo_black.png);
+      background-image: url('../../../assets/images/logo_black.png');
     }
+
     img {
       width: 130px;
     }
   }
+
   .nav {
-    flex: 1
+    flex: 1;
+
     li {
       font-size: 14px;
       height: 100%;
       padding: 0 15px;
+
       a {
         position: relative;
         transition: all 0.4s;
+
         &.router-link-active {
           color: $color-theme;
-            &::after {
-            content: "";
+
+          &::after {
+            content: '';
             position: absolute;
             background: $color-theme;
             left: 0;
@@ -263,10 +295,12 @@ export default {
       }
     }
   }
+
   .search {
     height: 100%;
     display: flex;
     align-items: center;
+
     i {
       font-size: 22px;
       color: #161e27;
@@ -274,12 +308,14 @@ export default {
       cursor: pointer;
     }
   }
+
   .userbox {
     display: flex;
     align-items: center;
     cursor: pointer;
     position: relative;
     padding-left: 20px;
+
     .line {
       width: 1px;
       height: 22px;
@@ -289,16 +325,20 @@ export default {
       top: 50%;
       margin-top: -11px;
     }
+
     .no-login {
       font-size: 14px;
+
       &:hover {
         color: $color-theme;
       }
     }
+
     .avatar {
       margin-right: 15px;
     }
   }
+
   .search-wrap {
     position: fixed;
     display: flex;
@@ -309,27 +349,30 @@ export default {
     height: 100vh;
     top: 0;
     left: 0;
+
     .overlay {
       width: 100%;
       height: 100vh;
       top: 0;
       left: 0;
       position: absolute;
-      background: rgba(120, 129, 147, .22);
+      background: rgba(120, 129, 147, 0.22);
       opacity: 0;
-      -webkit-transition: opacity .3s;
-      transition: opacity .3s;
+      -webkit-transition: opacity 0.3s;
+      transition: opacity 0.3s;
       -webkit-backface-visibility: hidden;
-      -webkit-transition-duration: .3s;
-      transition-duration: .3s;
+      -webkit-transition-duration: 0.3s;
+      transition-duration: 0.3s;
     }
+
     .search-body {
       position: relative;
       opacity: 0;
       width: 100%;
       max-width: 790px;
-      animation-duration: .3s;
+      animation-duration: 0.3s;
       animation-fill-mode: forwards;
+
       .search-content {
         background: #fff;
         position: relative;
@@ -340,12 +383,14 @@ export default {
         width: 100%;
         height: auto;
         overflow: hidden;
+
         .search-popup-cover {
           position: relative;
           overflow: hidden;
           padding: 3rem;
+
           .bg-effect {
-            background-image: url(../../../assets/images/personal.jpg);
+            background-image: url('../../../assets/images/personal.jpg');
             background-size: cover;
             background-repeat: no-repeat;
             background-position: center;
@@ -357,10 +402,11 @@ export default {
             filter: blur(8px);
             transform: scale(1.05);
             background-position: center;
+
             .layer {
               width: 100%;
               height: 100%;
-              background-color: rgba(0, 0, 0, .3);
+              background-color: rgba(0, 0, 0, 0.3);
               position: absolute;
               opacity: 1;
               top: 0;
@@ -368,71 +414,85 @@ export default {
               transition: opacity 0.3s ease-in-out;
             }
           }
+
           .search-form {
             position: relative;
             padding: 3rem 0;
+
             .text {
               display: block;
               width: 100%;
               background-clip: padding-box;
-              transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
-              font-size: .9375rem;
+              transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+              font-size: 0.9375rem;
               line-height: 1.5;
-              padding: .625rem .75rem;
+              padding: 0.625rem 0.75rem;
               height: calc(1.5em + 1.71875rem + 2px);
               text-align: center;
               font-weight: normal;
               color: #fff;
               border-color: transparent;
               background-color: rgba(255, 255, 255, 0.03);
-              transition: all .3s ease;
+              transition: all 0.3s ease;
               border-radius: 5px;
+
               &:hover {
                 background-color: rgba(255, 255, 255, 0.04);
                 border-color: transparent;
               }
+
               &:focus {
                 background-color: rgba(255, 255, 255, 0.04);
                 border-color: transparent;
                 color: #fff;
               }
+
               &::placeholder {
                 color: #fff;
-                opacity: 1
+                opacity: 1;
               }
             }
           }
         }
+
         .search-hot {
           padding: 1.5rem 3rem;
+
           .title {
             margin-bottom: 15px;
+
             i {
               color: $color-theme;
               font-size: 1.625rem;
               margin-right: 8px;
             }
+
             .nicelishi {
               font-size: 1.425rem;
             }
+
             span {
               font-size: 15px;
               flex: 1;
             }
+
             p {
               color: $color-theme;
               cursor: pointer;
             }
           }
+
           .tags {
             width: 100%;
             margin: 0 -0.25rem;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+
             li {
               padding: 0.25rem;
               cursor: pointer;
+
               .btn {
                 display: flex;
                 font-weight: 400;
@@ -442,12 +502,13 @@ export default {
                 vertical-align: middle;
                 user-select: none;
                 border: 1px solid transparent;
-                font-size: .75rem;
-                padding: .3125rem .75rem;
+                font-size: 0.75rem;
+                padding: 0.3125rem 0.75rem;
                 line-height: 1.5;
-                border-radius: .25rem;
-                transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+                border-radius: 0.25rem;
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
                 border-radius: 4px;
+
                 .close-dark {
                   display: inline-block;
                   background-image: url('../../../assets/images/close-dark.svg');
@@ -460,8 +521,10 @@ export default {
                   margin-left: 8px;
                   opacity: 0.7;
                 }
+
                 &:hover {
                   color: #161E27;
+
                   .close-dark {
                     opacity: 1;
                   }
@@ -471,6 +534,7 @@ export default {
           }
         }
       }
+
       .btn-close {
         position: absolute;
         bottom: -50px;
@@ -479,6 +543,7 @@ export default {
         z-index: 99;
         cursor: pointer;
         text-align: center;
+
         .close-light {
           display: inline-block;
           background-image: url('../../../assets/images/close.svg');
@@ -491,24 +556,28 @@ export default {
         }
       }
     }
+
     &.open {
       z-index: 1031;
+
       .overlay {
         opacity: 1;
         pointer-events: auto;
         -webkit-backdrop-filter: blur(10px);
         backdrop-filter: blur(10px);
       }
+
       .search-body {
         pointer-events: auto;
         -webkit-animation-name: tips-open;
         animation-name: tips-open;
       }
     }
+
     &.close {
       .search-body {
         -webkit-animation-name: tips-close;
-        animation-name: tips-close
+        animation-name: tips-close;
       }
     }
 
@@ -516,24 +585,27 @@ export default {
       0% {
         opacity: 0;
         -webkit-transform: translate3d(0, 50px, 0);
-        transform: translate3d(0, 50px, 0)
+        transform: translate3d(0, 50px, 0);
       }
+
       100% {
         opacity: 1;
         -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0)
+        transform: translate3d(0, 0, 0);
       }
     }
+
     @keyframes tips-close {
       0% {
         opacity: 1;
         -webkit-transform: translate3d(0, 0, 0);
-        transform: translate3d(0, 0, 0)
+        transform: translate3d(0, 0, 0);
       }
+
       100% {
         opacity: 0;
         -webkit-transform: translate3d(0, 50px, 0);
-        transform: translate3d(0, 50px, 0)
+        transform: translate3d(0, 50px, 0);
       }
     }
   }

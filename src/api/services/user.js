@@ -30,3 +30,6 @@ export const getUserRecord = (uid, type) =>
  */
 
 export const getUserArtist = uid => api.get(`/user/playlist?uid=${uid}`, {})
+
+// 退出登录
+export const logout = () => api.get(`/logout`, {})

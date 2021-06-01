@@ -131,7 +131,7 @@ export default {
           })
           setTimeout(() => {
             this.loginLoading = false
-            this.$router.push({ path: '/' })
+            this.$router.go(-1)
           }, 1500)
         }
       } catch (error) {

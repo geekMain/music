@@ -17,7 +17,7 @@ export default {
       banners: [],
       swiperOption: {
         slidesPerView: 3,
-        spaceBetween: 30,
+        spaceBetween: 18,
         slidesPerGroup: 3,
         loop: true,
         loopFillGroupWithBlank: true,

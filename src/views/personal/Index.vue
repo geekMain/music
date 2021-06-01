@@ -2,11 +2,35 @@
   <div class="personal-wrap">
     <div class="banner layer"></div>
     <div class="personal-main container">
+      <div class="center shadow">
+        <div class="card-header flex-between">
+          <p class="flex-row">
+            听歌排行 <span>（累积听歌{{ userDetail.listenSongs }}首）</span>
+          </p>
+          <div class="tab flex-row">
+            <span :class="type == 1 ? 'active' : ''" @click="changeType(1)"
+              >最近一周</span
+            >
+            <span class="line"></span>
+            <span :class="type == 0 ? 'active' : ''" @click="changeType(0)"
+              >所有时间</span
+            >
+          </div>
+        </div>
+        <artist-list
+          v-if="songs.length > 0"
+          :songs="songs"
+          :isPerson="isPerson"
+        />
+        <nice-empty v-else emptyText="ta可能不想让我们看到"></nice-empty>
+      </div>
       <div class="left">
         <div class="user-box shadow">
           <div
             class="background layer"
-            :style="{ backgroundImage: 'url(' + userProfile.backgroundUrl + ')' }"
+            :style="{
+              backgroundImage: 'url(' + userProfile.backgroundUrl + ')'
+            }"
           ></div>
           <div class="card flex-row">
             <div class="avatar">
@@ -15,7 +39,12 @@
             <div class="info flex-between">
               <p class="name">{{ userProfile.nickname }}</p>
               <div v-if="userInfo.userId === userProfile.userId">
-                <button class="sign-btn sign-btn-active" v-if="!userDetail.pcSign">签到</button>
+                <button
+                  class="sign-btn sign-btn-active"
+                  v-if="!userDetail.pcSign"
+                >
+                  签到
+                </button>
                 <button class="sign-btn" v-else>已签到</button>
               </div>
             </div>
@@ -47,46 +76,37 @@
             </div>
           </div>
           <ul class="follow">
-            <li>动态<span>{{ userProfile.eventCount }}</span></li>
-            <li>关注<span>{{ userProfile.newFollows }}</span></li>
-            <li>粉丝<span>{{ userProfile.followeds }}</span></li>
+            <li>
+              动态<span>{{ userProfile.eventCount }}</span>
+            </li>
+            <li>
+              关注<span>{{ userProfile.newFollows }}</span>
+            </li>
+            <li>
+              粉丝<span>{{ userProfile.followeds }}</span>
+            </li>
           </ul>
-          <div class="foot flex-center" v-if="userInfo.userId === userProfile.userId">
+          <div
+            class="foot flex-center"
+            v-if="userInfo.userId === userProfile.userId"
+          >
             <router-link tag="a" to="/">个人设置</router-link>
             <router-link tag="a" to="/">我的等级</router-link>
           </div>
         </div>
-      </div>
-      <div class="center shadow">
-        <div class="card-header flex-between">
-          <p class="flex-row">
-            听歌排行 <span>（累积听歌{{ userDetail.listenSongs }}首）</span>
-          </p>
-          <div class="tab flex-row">
-            <span :class="type == 1 ? 'active' : ''" @click="changeType(1)"
-              >最近一周</span
-            >
-            <span class="line"></span>
-            <span :class="type == 0 ? 'active' : ''" @click="changeType(0)"
-              >所有时间</span
-            >
+        <div class="right">
+          <div class="my module shadow">
+            <div class="card-header flex-row">
+              <span>我创建的歌单</span>
+            </div>
+            <song-sheet :sheetList="myList" :num="num"></song-sheet>
           </div>
-        </div>
-        <artist-list v-if="songs.length > 0" :songs="songs" :isPerson="isPerson" />
-        <nice-empty v-else emptyText="ta可能不想让我们看到"></nice-empty>
-      </div>
-      <div class="right">
-        <div class="my module shadow">
-          <div class="card-header flex-row">
-            <span>我创建的歌单</span>
+          <div class="my collect module shadow">
+            <div class="card-header flex-row">
+              <span>我收藏的歌单</span>
+            </div>
+            <song-sheet :sheetList="collectList" :num="num"></song-sheet>
           </div>
-          <song-sheet :sheetList="myList" :num="num"></song-sheet>
-        </div>
-        <div class="my collect module shadow">
-          <div class="card-header flex-row">
-            <span>我收藏的歌单</span>
-          </div>
-          <song-sheet :sheetList="collectList" :num="num"></song-sheet>
         </div>
       </div>
     </div>
@@ -127,7 +147,7 @@ export default {
   watch: {
     $route(newVal, oldVal) {
       console.log(newVal.query.id)
-      if(newVal.query.id) {
+      if (newVal.query.id) {
         this.getUserDetail(newVal.query.id)
       } else {
         this.getUserDetail(this.userInfo.userId)
@@ -174,7 +194,7 @@ export default {
         let res = await this.$api.getUserDetail(id)
         if (res.code === 200) {
           this.userDetail = res
-          this.userProfile =  res.profile
+          this.userProfile = res.profile
           this._initialize()
         }
       } catch (error) {
@@ -184,7 +204,10 @@ export default {
     // 获取用户播放记录
     async getUserRecord() {
       try {
-        let res = await this.$api.getUserRecord(this.userProfile.userId, this.type)
+        let res = await this.$api.getUserRecord(
+          this.userProfile.userId,
+          this.type
+        )
         if (res.code === 200) {
           if (this.type == 1) {
             this.songs = this._normalizeSongs(res.weekData)
@@ -240,7 +263,7 @@ export default {
   created() {},
   mounted() {
     let userid = this.$route.query.id
-    if(userid) {
+    if (userid) {
       this.getUserDetail(userid)
     } else {
       this.getUserDetail(this.userInfo.userId)
@@ -263,10 +286,11 @@ export default {
     display: flex;
     align-items: flex-start;
     .left {
-      width: 350px;
+      width: 340px;
       position: relative;
-      top: -60px;
-      margin-right: 20px;
+      // top: -60px;
+      margin-top: 40px;
+      flex-shrink: 0;
       .user-box {
         background: #fff;
         border-radius: 5px;
@@ -308,7 +332,7 @@ export default {
             .sign-btn {
               padding: 3px 15px;
               font-size: 12px;
-              color: #fff;              
+              color: #fff;
               border-radius: 30px;
               &.sign-btn-active {
                 background: #fa2800;
@@ -407,7 +431,8 @@ export default {
       }
     }
     .center {
-      width: 640px;
+      // width: 640px;
+      flex: 1;
       background: #fff;
       position: relative;
       margin-top: 40px;
@@ -444,13 +469,13 @@ export default {
       }
     }
     .right {
-      width: 350px;
+      width: 340px;
       flex-shrink: 0;
       border-radius: 5px;
       background: #fff;
       position: relative;
       padding-bottom: 30px;
-      margin-top: 40px;
+      margin-top: 20px;
       .card-header {
         border-left: 3px solid $color-theme;
         height: 20px;

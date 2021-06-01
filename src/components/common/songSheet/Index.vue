@@ -86,11 +86,11 @@ export default {
 .list {
   display: flex;
   flex-wrap: wrap;
-  margin: 0 -15px;
+  margin: 0 -10px;
   .item {
     flex: 0 0 12.5%;
     max-width: 12.5%;
-    padding: 0 15px 30px;
+    padding: 0 10px 25px;
     cursor: pointer;
     &.two {
       flex: 0 0 50%;
@@ -103,7 +103,7 @@ export default {
         content: "";
         width: 100%;
         height: 100%;
-        background-color: #d9d9d9;
+        background: rgba(0,0,0,0.2);
         position: absolute;
         top: 0;
         transition: all 0.4s;
@@ -114,9 +114,10 @@ export default {
         transform-origin: 100% 50%;
         z-index: 2;
         border-radius: 2px;
+        opacity: .9;
       }
       &:after {
-        right: 4px;
+        right: 1px;
         transform: scale(.73);
         transform-origin: 100% 50%;
         z-index: 1;
@@ -197,19 +198,6 @@ export default {
       margin-top: 15px;
       .name {
         font-size: 14px;
-      }
-    }
-    &:hover {
-      .wrapper {
-        &:before, &:after {
-          background: rgba(250, 40, 0, 0.1);
-        }
-        &:before {
-          right: 4px;
-        }
-        &:after {
-          right: 0px;
-        }
       }
     }
   }
