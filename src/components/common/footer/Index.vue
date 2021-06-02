@@ -6,12 +6,12 @@
         nicemusic
       </p>
       <div class="social flex-row">
-        <a href="">
+        <a href="https://music.163.com/#/user/home?id=119832090" target="_blank">
           <span class="flex-center">
             <i class="iconfont nicewangyiyunyinle"></i>
           </span>
         </a>
-        <a href="">
+        <a href="https://gitee.com/lxhcool/desktop-nicemusic" target="_blank">
           <span class="flex-center">
             <i class="iconfont niceicon_githubb"></i>
           </span>
