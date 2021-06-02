@@ -1,132 +1,162 @@
 <template>
   <transition name="fade">
-    <div class="player-bar shadow flex-row" v-show="playList.length > 0">
-      <div class="avatar">
-        <img :src="currentSong.image" alt="nicemusic" />
-      </div>
-      <div class="info">
-        <h2 class="ellipsis">{{ currentSong.name }}</h2>
-        <p class="ellipsis">{{ currentSong.singer }}</p>
-      </div>
-      <div class="player-btn">
-        <i class="iconfont icon-prev niceshangyishou" @click="prevSong"></i>
-        <i
-          class="iconfont icon-play nicebofang2"
-          :class="playIcon"
-          @click="togglePlaying"
-        ></i>
-        <i class="iconfont icon-next nicexiayishou" @click="nextSong"></i>
-      </div>
-      <div class="progress-wrap" id="progress-wrap">
-        <p class="current-time">{{ formatTime(currentTime) }}</p>
-        <progress-bar
-          :percent="percent"
-          @percentChange="onPercentBarChange"
-        ></progress-bar>
-        <p class="duration-time">
-          {{ formatTime(currentSong.duration) }}
-        </p>
-      </div>
-      <div class="volume-wrap">
-        <i
-          class="iconfont volume-icon"
-          @click="changeMuted"
-          :class="mutedIcon"
-        ></i>
-        <div class="progress-bar">
-          <el-slider
-            v-model="volumeNum"
-            style="width: 100%;"
-            class="bar-inner"
-            @change="changeVolume"
-            :show-tooltip="false"
-          ></el-slider>
-        </div>
-      </div>
-      <div class="tool">
-        <i class="iconfont" :class="modeIcon" @click="changeMode"></i>
-        <i class="iconfont nicegeci32" @click="openLyric"></i>
-        <i class="iconfont nicebofangliebiao24" @click="openPlaylist"></i>
-      </div>
-      <audio
-        ref="audio"
-        :src="currentSong.url"
-        @playing="audioReady"
-        @error="audioError"
-        @timeupdate="updateTime"
-        @ended="audioEnd"
-        @pause="audioPaused"
-        :muted="isMuted"
-      ></audio>
-      <transition name="fade">
-        <div class="lyric-box shadow" v-if="showLyric">
-          <div class="title flex-between">歌词</div>
-          <scroll
-            class="lyric"
-            ref="lyricList"
-            :data="currentLyric && currentLyric.lines"
-          >
-            <div class="lyric-wrapper">
-              <div v-if="currentLyric">
-                <p
-                  ref="lyricLine"
-                  class="lyric-text"
-                  :class="currentLyricNum === index ? 'active' : ''"
-                  v-for="(item, index) of currentLyric.lines"
-                  :key="index"
-                >
-                  {{ item.txt }}
-                </p>
+    <div class="player-bar flex-row" v-show="playList.length > 0">
+      <div class="container">
+        <div class="wrapper flex-row">
+          <div class="left flex-row">
+            <div class="player-btn">
+              <i class="iconfont icon-prev nice1_music83" @click="prevSong"></i>
+              <div class="icon-play flex-center" @click="togglePlaying">
+                <i class="iconfont" :class="playIcon"></i>
               </div>
-              <div class="no-lyric" v-else>暂无歌词，请您欣赏</div>
-            </div>
-          </scroll>
-          <div class="foot"></div>
-        </div>
-      </transition>
-      <transition name="fade">
-        <div class="lyric-box playlist-box shadow" v-if="showPlaylist">
-          <div class="title flex-between">播放列表<i class="iconfont nicelajitong" alt="清空" title="清空" @click="clearHistory"></i></div>
-          <div class="list">
-            <div class="item flex-row" v-for="(item, index) of historyList" :key="item.id" :class="currentSong.id == item.id && playing
-                ? 'playing'
-                : ''
-            ">
-              <div class="index-container flex-center">
-                <span class="num">{{ utils.formatZero(index + 1, 2) }}</span>
-                <div class="play-icon">
-                  <div class="line" style="animation-delay: -1.2s;"></div>
-                  <div class="line"></div>
-                  <div class="line" style="animation-delay: -1.5s;"></div>
-                  <div class="line" style="animation-delay: -0.9s;"></div>
-                  <div class="line" style="animation-delay: -0.6s;"></div>
-                </div>
-                <i
-                  class="iconfont nicebofang2 play-btn"
-                  @click="playSong(item, index)"
-                ></i>
-                <i
-                  class="iconfont nicezanting1 pause-btn"
-                  @click="pauseSong(item, index)"
-                ></i>
-              </div>
-              <p class="ellipsis">{{item.name}}</p>
-              <i class="iconfont niceIcon_cloose" @click="deleteHistoryItem(item, index)"></i>
+              <i class="iconfont icon-next nice1_music82" @click="nextSong"></i>
             </div>
           </div>
-          <div class="foot"></div>
+          <div class="center">
+            <img
+              class="cover"
+              :src="currentSong.image ? currentSong.image : defaultCover"
+              alt="nicemusic"
+            />
+            <div class="info">
+              {{ currentLyricTxt }}
+              <div class="top flex-between">
+                <h2 class="name">
+                  {{ currentSong.name ? currentSong.name : '未选择歌曲'
+                  }}<span>{{ currentSong.singer }}</span>
+                </h2>
+                <p class="time" v-if="currentSong.duration">
+                  {{ formatTime(currentTime) }} /
+                  {{ formatTime(currentSong.duration) }}
+                </p>
+                <p class="time" v-else>
+                  00:00 / 00:00
+                </p>
+              </div>
+              <div class="progress-wrap flex-row">
+                <a-slider
+                  v-model="percent"
+                  :disabled="currentIndex === -1"
+                  @change="changeProgress"
+                  @afterChange="changeProgressAfter"
+                  :tip-formatter="progressFormatter"
+                />
+              </div>
+            </div>
+          </div>
+          <div class="right flex-row">
+            <div class="volume-wrap flex-row">
+              <i
+                class="iconfont volume-icon"
+                @click="changeMuted"
+                :class="mutedIcon"
+              ></i>
+              <a-slider v-model="volumeNum" @change="changeVolume"></a-slider>
+            </div>
+            <div class="tool">
+              <i class="iconfont" :class="modeIcon" @click="changeMode"></i>
+              <i class="iconfont nicegeci32" @click="openLyric"></i>
+              <i class="iconfont nicebofangliebiao24" @click="openPlaylist"></i>
+            </div>
+          </div>
+          <audio
+            ref="audio"
+            :src="currentSong.url"
+            @playing="audioReady"
+            @error="audioError"
+            @timeupdate="updateTime"
+            @ended="audioEnd"
+            @pause="audioPaused"
+            :muted="isMuted"
+          ></audio>
+          <transition name="fade">
+            <div class="lyric-box shadow" v-if="showLyric">
+              <div class="title flex-between">歌词</div>
+              <scroll
+                class="lyric"
+                ref="lyricList"
+                :data="currentLyric && currentLyric.lines"
+              >
+                <div class="lyric-wrapper">
+                  <div v-if="currentLyric">
+                    <p
+                      ref="lyricLine"
+                      class="lyric-text"
+                      :class="currentLyricNum === index ? 'active' : ''"
+                      v-for="(item, index) of currentLyric.lines"
+                      :key="index"
+                    >
+                      {{ item.txt }}
+                    </p>
+                  </div>
+                  <div class="no-lyric" v-else>暂无歌词，请您欣赏</div>
+                </div>
+              </scroll>
+              <div class="foot"></div>
+            </div>
+          </transition>
+          <transition name="fade">
+            <div class="lyric-box playlist-box shadow" v-if="showPlaylist">
+              <div class="title flex-between">
+                播放列表<i
+                  class="iconfont nicelajitong"
+                  alt="清空"
+                  title="清空"
+                  @click="clearHistory"
+                ></i>
+              </div>
+              <div class="list">
+                <div
+                  class="item flex-row"
+                  v-for="(item, index) of historyList"
+                  :key="item.id"
+                  :class="currentSong.id == item.id && playing ? 'playing' : ''"
+                >
+                  <div class="index-container flex-center">
+                    <span class="num">{{
+                      utils.formatZero(index + 1, 2)
+                    }}</span>
+                    <div class="play-icon">
+                      <div class="line" style="animation-delay: -1.2s;"></div>
+                      <div class="line"></div>
+                      <div class="line" style="animation-delay: -1.5s;"></div>
+                      <div class="line" style="animation-delay: -0.9s;"></div>
+                      <div class="line" style="animation-delay: -0.6s;"></div>
+                    </div>
+                    <i
+                      class="iconfont nicebofang2 play-btn"
+                      @click="playSong(item, index)"
+                    ></i>
+                    <i
+                      class="iconfont nicezanting1 pause-btn"
+                      @click="pauseSong(item, index)"
+                    ></i>
+                  </div>
+                  <p class="ellipsis">{{ item.name }}</p>
+                  <i
+                    class="iconfont niceIcon_cloose"
+                    @click="deleteHistoryItem(item, index)"
+                  ></i>
+                </div>
+              </div>
+              <div class="foot"></div>
+            </div>
+          </transition>
         </div>
-      </transition>
+      </div>
     </div>
   </transition>
 </template>
 
 <script>
-import progressBar from 'components/common/progressBar/Index'
+import Vue from 'vue'
+import 'ant-design-vue/dist/antd.css'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { playMode } from '@/common/playConfig'
 import Scroll from 'components/common/scroll/Index'
 import Lyric from 'lyric-parser'
+import { Slider } from 'ant-design-vue'
+Vue.use(Slider)
 export default {
   data() {
     return {
@@ -134,6 +164,7 @@ export default {
       currentTime: 0,
       currentLyric: null,
       currentLyricNum: 0,
+      currentLyricTxt: '',
       showLyric: false,
       showPlaylist: false,
       id: '',
@@ -142,17 +173,19 @@ export default {
       pureMusicLyric: '',
       isMuted: false,
       volume: 0.5,
-      volumeNum: 50
+      volumeNum: 50,
+      percent: 0,
+      defaultCover: require('../../../assets/images/cd.png'),
+      progressState: false
     }
   },
   components: {
-    progressBar,
     Scroll
   },
   computed: {
     // 播放暂停按钮
     playIcon() {
-      return this.playing ? 'nicezanting1' : 'nicebofang2'
+      return this.playing ? 'nice07zanting' : 'niceicon_play'
     },
     // 播放模式
     modeIcon() {
@@ -167,9 +200,6 @@ export default {
       return this.isMuted ? 'nicejingyin1' : 'niceshengyin1'
     },
     // 进度条
-    percent() {
-      return this.currentTime / this.currentSong.duration
-    },
     ...mapGetters([
       'playList',
       'currentSong',
@@ -256,18 +286,20 @@ export default {
         this.showPlaylist = true
       }
     },
-    // 控制静音
+    // 控制音量大小
     changeMuted() {
-      if (this.isMuted) {
-        this.isMuted = false
-        this.$refs.audio.muted = false
-      } else {
-        this.isMuted = true
-        this.$refs.audio.muted = true
-      }
+      this.isMuted ? this.mutedHandle(false, 50) : this.mutedHandle(true, 0)
+    },
+    // 控制是否静音
+    mutedHandle(state, num) {
+      console.log(num)
+      this.isMuted = state
+      this.volumeNum = num
+      this.$refs.audio.volume = num / 100
     },
     // 改变音量
     changeVolume(e) {
+      e === 0 ? (this.isMuted = true) : (this.isMuted = false)
       this.volume = e / 100
       this.$refs.audio.volume = e / 100
     },
@@ -287,20 +319,19 @@ export default {
     async getLyric(id) {
       try {
         let res = await this.$api.getLyric(id)
+        console.log(res)
         if (res.code === 200) {
           let lyric = res.lrc.lyric
           this.currentLyric = new Lyric(lyric, this.lyricHandle)
           if (this.isPureMusic) {
-            const timeExp = /\[(\d{2}):(\d{2}):(\d{2})]/g
-            this.pureMusicLyric = this.currentLyric.lrc
-              .replace(timeExp, '')
-              .trim()
-            this.playingLyric = this.pureMusicLyric
+            this.playingLyric = this.currentLyric.lrc.replace(
+              /\[(\d{2}):(\d{2}):(\d{2})\]/g,
+              ''
+            )
           } else {
             if (this.playing && this.canLyricPlay) {
               this.currentLyric.seek(this.currentTime * 1000)
             }
-            console.log(this.currentLyric)
           }
         }
       } catch (error) {
@@ -315,6 +346,7 @@ export default {
         return
       }
       this.currentLyricNum = lineNum
+      this.playingLyric = txt
       if (lineNum > 10) {
         let lineEl = this.$refs.lyricLine[lineNum - 10]
         if (this.$refs.lyricList) {
@@ -329,7 +361,6 @@ export default {
           })
         }
       }
-      this.playingLyric = txt
     },
     // 点击播放暂停
     togglePlaying() {
@@ -420,15 +451,32 @@ export default {
     },
     // 监听播放时间改变
     updateTime(e) {
-      this.currentTime = e.target.currentTime
+      // console.log(e)
+      if (!this.progressState) {
+        this.currentTime = e.target.currentTime
+        this.percent = (e.target.currentTime / this.currentSong.duration) * 100
+      }
     },
-    // 进度条拖动改变播放进度
-    onPercentBarChange(percent) {
-      const currentTime = this.currentSong.duration * percent
-      this.currentTime = this.$refs.audio.currentTime = currentTime
+    // 进度条悬浮时间
+    progressFormatter() {
+      return this.formatTime(this.currentTime)
+    },
+    // 改变进度
+    changeProgress(val) {
+      this.progressState = true
+      const currentTime = (val / 100) * this.currentSong.duration
+      this.currentTime = currentTime
+      this.percent = val
       if (this.currentLyric) {
         this.currentLyric.seek(currentTime * 1000)
       }
+    },
+    // 拖动结束
+    changeProgressAfter(val) {
+      const currentTime = ((val / 100) * this.currentSong.duration) / 1000
+      this.$refs.audio.currentTime = currentTime * 1000
+      this.currentTime = currentTime * 1000
+      this.progressState = false
       if (!this.playing) {
         this.togglePlaying()
       }
@@ -501,152 +549,194 @@ export default {
 .player-bar {
   width: 100%;
   height: 72px;
-  background: #fff;
+  background: rgba(255,255,255,0.95);
   position: fixed;
   bottom: 0;
   right: 0;
   left: 0;
-  z-index: 8000;
+  z-index: 20;
   padding: 0 10px 0 20px;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
   justify-content: space-between;
-  .avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 5px;
-    margin-right: 30px
-    flex-shrink: 0;
-    img {
-      width: 60px;
-      height: 60px;
-      border-radius: 5px;
-    }
-  }
-  .info {
-    margin-right: 15px;
-    flex-shrink: 0;
-    width: 120px;
-    h2 {
-      font-size: 14px;
-      color: #333;
-      margin-bottom: 15px;
-    }
-    p {
-      font-size: 12px;
-      color: #999999;
-    }
-  }
-  .player-btn {
-    display: flex;
-    align-items: center;
-    i {
-      cursor: pointer;
-      &:active {
-        opacity: 0.8;
+  padding-left: calc(100vw - 100%);
+  .left {
+    margin-right: 20px;
+    .player-btn {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      i {
+        cursor: pointer;
+        &:active {
+          opacity: 0.8;
+        }
+      }
+      .icon-prev,
+      .icon-next {
+        font-size: 20px;
+        color: #fa2800;
+      }
+      .icon-play {
+        width: 43px;
+        height: 43px;
+        background: linear-gradient(110deg, #fa2800, #fb8974);
+        border-radius: 50%;
+        margin: 0 26px;
+        i {
+          font-size: 22px;
+          color: #ffffff;
+        }
       }
     }
-    .icon-prev {
-      font-size: 40px;
-    }
-    .icon-play {
-      font-size: 60px;
-      margin: 0 10px;
-    }
-    .icon-next {
-      font-size: 40px;
-    }
   }
-  .progress-wrap {
-    width: 650px;
-    height: 100%;
+  .center {
+    height: 72px;
     display: flex;
+    justify-content: center;
     align-items: center;
-    margin-left: 80px;
     flex: 1;
-    p {
-      font-size: 14px;
-    }
-  }
-  .volume-wrap {
-    width: 180px;
-    margin-left: 40px;
-    display: flex;
-    align-items: center;
-    margin-right: 80px;
-    .volume-icon {
-      font-size: 26px;
-      font-weight: bold;
+    .cover {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+      border-radius: 4px;
       cursor: pointer;
     }
-    .progress-bar {
-      position: relative;
+    .info {
       width: 100%;
-      flex: 1;
-      height: 2px;
-      background: rgba(0,0,0,.05);
-      border-radius: 2px;
+      margin: 0 20px 0 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 72px;
+      .name {
+        font-size: 13px;
+        font-weight: bold;
+        margin-right: 10px;
+        span {
+          font-size: 12px;
+          color: #888888;
+          font-weight: 200;
+          margin-left: 10px;
+        }
+      }
+    }
+    .progress-wrap {
+      width: 100%;
+      span {
+        font-size: 14px;
+      }
+      .ant-slider {
+        margin: 15px 5px 0 5px;
+      }
+    }
+  }
+  .right {
+    height: 72px;
+    .volume-icon {
+      font-size: 23px;
+      font-weight: 700;
       cursor: pointer;
-      margin-left: 10px;
-      .bar-inner {
-        position: absolute;
-        top: 0;
-        left: 0;
-        display: flex;
-        align-items: center;
-        .progress {
-          width: 50px;
-          background: $color-theme;
-          height: 2px;
-          border-radius: 2px;
-        }
-        .progress-btn {
-          position: absolute;
-          z-index: 100;
-          right: -4px;
-          width: 10px;
-          height: 10px;
-          top: -4.5px;
-          background: $color-theme;
-          box-shadow: 0 0 15px 0 rgba(0,0,0,.15);
-          border-radius: 50%;
-          &::after {
-            position: absolute;
-            content: " ";
-            top: 50%;
-            left: 50%;
-            margin: -3px 0 0 -3px;
-            width: 6px;
-            height: 6px;
-            background: #ffffff;
-            border-radius: 50%;
-          }
-        }
+      margin-right: 10px;
+    }
+    .volume-wrap {
+      width: 150px;
+      margin-right: 10px;
+      .ant-slider {
+        margin-top: 9px;
       }
     }
-  }
-  .tool {
-    .iconfont {
-      font-size: 26px;
-      margin: 0 15px;
-      cursor: pointer
-      &:active {
-        opacity: 0.7;
-      }
-      &.icon-like {
+    .tool {
+      i {
         font-size: 26px;
+        margin: 0 10px;
+        cursor: pointer;
       }
     }
   }
+  // .volume-wrap {
+  //   width: 180px;
+  //   margin-left: 40px;
+  //   display: flex;
+  //   align-items: center;
+  //   margin-right: 80px;
+  //   .volume-icon {
+  //     font-size: 26px;
+  //     font-weight: bold;
+  //     cursor: pointer;
+  //   }
+  //   .progress-bar {
+  //     position: relative;
+  //     width: 100%;
+  //     flex: 1;
+  //     height: 2px;
+  //     background: rgba(0,0,0,.05);
+  //     border-radius: 2px;
+  //     cursor: pointer;
+  //     margin-left: 10px;
+  //     .bar-inner {
+  //       position: absolute;
+  //       top: 0;
+  //       left: 0;
+  //       display: flex;
+  //       align-items: center;
+  //       .progress {
+  //         width: 50px;
+  //         background: $color-theme;
+  //         height: 2px;
+  //         border-radius: 2px;
+  //       }
+  //       .progress-btn {
+  //         position: absolute;
+  //         z-index: 100;
+  //         right: -4px;
+  //         width: 10px;
+  //         height: 10px;
+  //         top: -4.5px;
+  //         background: $color-theme;
+  //         box-shadow: 0 0 15px 0 rgba(0,0,0,.15);
+  //         border-radius: 50%;
+  //         &::after {
+  //           position: absolute;
+  //           content: " ";
+  //           top: 50%;
+  //           left: 50%;
+  //           margin: -3px 0 0 -3px;
+  //           width: 6px;
+  //           height: 6px;
+  //           background: #ffffff;
+  //           border-radius: 50%;
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
+  // .tool {
+  //   .iconfont {
+  //     font-size: 26px;
+  //     margin: 0 15px;
+  //     cursor: pointer
+  //     &:active {
+  //       opacity: 0.7;
+  //     }
+  //     &.icon-like {
+  //       font-size: 26px;
+  //     }
+  //   }
+  // }
   .lyric-box {
-    width: 360px;
-    height: 580px;
+    width: 345px;
+    height: 550px;
     position: absolute;
-    right: 0;
-    bottom: 80px;
+    right: 5px;
+    bottom: 30px;
     border-radius: 3px;
     padding: 30px;
     overflow: hidden
     .title {
-      margin: 10px 0 30px;
+      margin: 10px 0 20px;
       font-weight: 500;
       font-size: 16px;
       i {
@@ -685,7 +775,7 @@ export default {
     }
   }
   .playlist-box {
-    width: 460px;
+    width: 345px;
     .list {
       overflow-y: scroll;
       max-height: calc(100% - 90px);

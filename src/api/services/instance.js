@@ -37,7 +37,6 @@ instance.interceptors.response.use(
   response => {
     let data = response.data
     let status = response.status
-    console.log(status)
     if (status === 200) {
       return Promise.resolve(data)
     } else if (status === 301) {
@@ -63,9 +62,7 @@ ajaxMethod.forEach(method => {
     return new Promise(function(resolve, reject) {
       instance[method](uri, data, config)
         .then(response => {
-          if (response.code === 200) {
-            resolve(response)
-          }
+          resolve(response)
         })
         .catch(error => {
           reject(error)
