@@ -5,6 +5,8 @@
 
 ## 预览地址
 [vue-desktop-nicemusic](https://nicemusic-desktop.lxhcool.cn)
+
+## 预览地址2
 [vue-desktop-nicemusic](http://nicenav.cn/desktop-music)
 
 ##### 登录
