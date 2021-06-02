@@ -4,6 +4,7 @@
 [Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
 ## 预览地址
+[vue-desktop-nicemusic](https://nicemusic-desktop.lxhcool.cn)
 [vue-desktop-nicemusic](http://nicenav.cn/desktop-music)
 
 ##### 登录
