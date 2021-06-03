@@ -32,7 +32,7 @@ export default {
 .fly {
   pointer-events: none;
   position: fixed;
-  z-index: 100;
+  z-index: 9999;
 }
 .bg-fly-circle1 {
   left: 40px;

@@ -1,7 +1,7 @@
 <template>
-  <transition name="fade">
+  <transition name="slide-fade">
     <div class="player-bar flex-row" v-show="playList.length > 0">
-      <div class="container">
+      <div class="container" style="z-index: 30;">
         <div class="wrapper flex-row">
           <div class="left flex-row">
             <div class="player-btn">
@@ -17,6 +17,7 @@
               class="cover"
               :src="currentSong.image ? currentSong.image : defaultCover"
               alt="nicemusic"
+              @click="toPlayer(currentSong)"
             />
             <div class="info">
               {{ currentLyricTxt }}
@@ -69,34 +70,8 @@
             @pause="audioPaused"
             :muted="isMuted"
           ></audio>
-          <transition name="fade">
-            <div class="lyric-box shadow" v-if="showLyric">
-              <div class="title flex-between">歌词</div>
-              <scroll
-                class="lyric"
-                ref="lyricList"
-                :data="currentLyric && currentLyric.lines"
-              >
-                <div class="lyric-wrapper">
-                  <div v-if="currentLyric">
-                    <p
-                      ref="lyricLine"
-                      class="lyric-text"
-                      :class="currentLyricNum === index ? 'active' : ''"
-                      v-for="(item, index) of currentLyric.lines"
-                      :key="index"
-                    >
-                      {{ item.txt }}
-                    </p>
-                  </div>
-                  <div class="no-lyric" v-else>暂无歌词，请您欣赏</div>
-                </div>
-              </scroll>
-              <div class="foot"></div>
-            </div>
-          </transition>
-          <transition name="fade">
-            <div class="lyric-box playlist-box shadow" v-if="showPlaylist">
+          <transition name="slide-fade">
+            <div class="playlist-box shadow" v-if="showPlaylist">
               <div class="title flex-between">
                 播放列表<i
                   class="iconfont nicelajitong"
@@ -144,6 +119,34 @@
           </transition>
         </div>
       </div>
+      <transition name="slide-fade">
+        <div class="player-page" v-show="showLyric">
+          <div class="container">
+            <div class="page-left">
+              <div class="cover-image" :class="playing ? 'playing' : ''">
+                <img :src="currentSong.image" />
+              </div>
+            </div>
+            <div class="page-right">
+              <h3 class="name flex-between">
+                {{ currentSong.name }}
+                <i
+                  @click="openLyric"
+                  class="iconfont niceiconfontyoujiantou-copy-copy-copy-copy"
+                ></i>
+              </h3>
+              <p>{{ currentSong.singer }} - {{ currentSong.album }}</p>
+              <div class="lyric-wrap">
+                <n-lyric
+                  ref="lyricRef"
+                  :currentLyric="currentLyric"
+                  :currentLyricNum="currentLyricNum"
+                ></n-lyric>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
     </div>
   </transition>
 </template>
@@ -153,9 +156,9 @@ import Vue from 'vue'
 import 'ant-design-vue/dist/antd.css'
 import { mapGetters, mapMutations, mapActions } from 'vuex'
 import { playMode } from '@/common/playConfig'
-import Scroll from 'components/common/scroll/Index'
 import Lyric from 'lyric-parser'
 import { Slider } from 'ant-design-vue'
+import NLyric from 'components/common/lyric/Index'
 Vue.use(Slider)
 export default {
   data() {
@@ -180,7 +183,7 @@ export default {
     }
   },
   components: {
-    Scroll
+    NLyric
   },
   computed: {
     // 播放暂停按钮
@@ -279,7 +282,6 @@ export default {
     },
     // 展开播放列表
     openPlaylist() {
-      this.showLyric = false
       if (this.showPlaylist) {
         this.showPlaylist = false
       } else {
@@ -305,7 +307,6 @@ export default {
     },
     // 展开歌词
     openLyric() {
-      this.showPlaylist = false
       if (this.showLyric) {
         this.showLyric = false
       } else {
@@ -342,22 +343,22 @@ export default {
     },
     // 歌词回调
     lyricHandle({ lineNum, txt }) {
-      if (!this.$refs.lyricLine) {
+      if (!this.$refs.lyricRef.$refs.lyricLine) {
         return
       }
       this.currentLyricNum = lineNum
       this.playingLyric = txt
       if (lineNum > 10) {
-        let lineEl = this.$refs.lyricLine[lineNum - 10]
-        if (this.$refs.lyricList) {
+        let lineEl = this.$refs.lyricRef.$refs.lyricLine[lineNum - 10]
+        if (this.$refs.lyricRef.$refs.lyricList) {
           this.$nextTick(() => {
-            this.$refs.lyricList.scrollToElement(lineEl, 1000)
+            this.$refs.lyricRef.$refs.lyricList.scrollToElement(lineEl, 1000)
           })
         }
       } else {
-        if (this.$refs.lyricList) {
+        if (this.$refs.lyricRef.$refs.lyricList) {
           this.$nextTick(() => {
-            this.$refs.lyricList.scrollTo(0, 0, 1000)
+            this.$refs.lyricRef.$refs.lyricList.scrollTo(0, 0, 1000)
           })
         }
       }
@@ -508,6 +509,16 @@ export default {
       const s = interval % 60
       return `${this.utils.formatZero(m, 2)}:${this.utils.formatZero(s, 2)}`
     },
+    // 播放页
+    toPlayer(song) {
+      console.log(song)
+      this.$router.push({
+        name: 'player',
+        query: {
+          id: song.id
+        }
+      })
+    },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
@@ -529,23 +540,21 @@ export default {
 }
 </script>
 <style lang="stylus" scoped>
-.fade-enter {
+
+.slide-fade-enter-active {
+  transition: all 0.5s ease;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(0.5, 0.3, 0.2, 0.5);
+}
+
+.slide-fade-enter,
+.slide-fade-leave-to {
   opacity: 0;
-  transform: translate3d(0, 30px, 0);
+  transform: translateY(30px);
 }
 
-.fade-enter-active {
-  transition: all 0.5s;
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translate3d(0, 30px, 0);
-}
-
-.fade-leave-active {
-  transition: all 0.5s;
-}
 .player-bar {
   width: 100%;
   height: 72px;
@@ -554,13 +563,92 @@ export default {
   bottom: 0;
   right: 0;
   left: 0;
-  z-index: 20;
+  z-index: 2001;
   padding: 0 10px 0 20px;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding-left: calc(100vw - 100%);
+  .player-page {
+    width: 100%;
+    height: 100vh;
+    background: rgba(255,255,255,1);
+    position: fixed;
+    top: 0px;
+    left: 0;
+    padding-top: 100px;
+    .container {
+      display: flex;
+      .page-left,
+      .page-right {
+        width: 50%;
+      }
+      .cover-image {
+        width: 400px;
+        height: 400px;
+        position: relative;
+
+        img {
+          width: 100%;
+          height: 100%;
+          border-radius: 5px;
+          position: relative;
+          z-index: 2;
+          opacity: 1;
+          overflow: hidden;
+          border-radius: 5px;
+          box-shadow: 5px 0 10px -5px #141414;
+        }
+
+        &::after {
+          content: '';
+          position: absolute;
+          left: 20%;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          z-index: 1;
+          transition: all cubic-bezier(0.4, 0, 0.2, 1) 0.8s 0.5s;
+          background: transparent url('../../../assets/images/cd-wrap.png') center no-repeat;
+          background-size: contain;
+        }
+
+        &.playing {
+          &::after {
+            -webkit-animation: rotate 2s linear infinite;
+            -moz-animation: rotate 2s linear infinite;
+            -ms-animation: rotate 2s linear infinite;
+            -o-animation: rotate 2s linear infinite;
+            animation: rotate 2s linear infinite;
+          }
+        }
+      }
+
+      .page-right {
+        .name {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 10px;
+          .iconfont {
+            font-size: 35px;
+            color: #888;
+            cursor: pointer;
+            transform: rotate(90deg)
+          }
+        }
+        .lyric-wrap {
+          width: 100%;
+          height: 480px;
+          border-radius: 4px;
+          padding: 30px;
+          overflow: hidden;
+          background: #f8f9ff;
+          margin-top: 30px;
+        }
+      }
+    }
+  }
   .left {
     margin-right: 20px;
     .player-btn {
@@ -656,77 +744,7 @@ export default {
       }
     }
   }
-  // .volume-wrap {
-  //   width: 180px;
-  //   margin-left: 40px;
-  //   display: flex;
-  //   align-items: center;
-  //   margin-right: 80px;
-  //   .volume-icon {
-  //     font-size: 26px;
-  //     font-weight: bold;
-  //     cursor: pointer;
-  //   }
-  //   .progress-bar {
-  //     position: relative;
-  //     width: 100%;
-  //     flex: 1;
-  //     height: 2px;
-  //     background: rgba(0,0,0,.05);
-  //     border-radius: 2px;
-  //     cursor: pointer;
-  //     margin-left: 10px;
-  //     .bar-inner {
-  //       position: absolute;
-  //       top: 0;
-  //       left: 0;
-  //       display: flex;
-  //       align-items: center;
-  //       .progress {
-  //         width: 50px;
-  //         background: $color-theme;
-  //         height: 2px;
-  //         border-radius: 2px;
-  //       }
-  //       .progress-btn {
-  //         position: absolute;
-  //         z-index: 100;
-  //         right: -4px;
-  //         width: 10px;
-  //         height: 10px;
-  //         top: -4.5px;
-  //         background: $color-theme;
-  //         box-shadow: 0 0 15px 0 rgba(0,0,0,.15);
-  //         border-radius: 50%;
-  //         &::after {
-  //           position: absolute;
-  //           content: " ";
-  //           top: 50%;
-  //           left: 50%;
-  //           margin: -3px 0 0 -3px;
-  //           width: 6px;
-  //           height: 6px;
-  //           background: #ffffff;
-  //           border-radius: 50%;
-  //         }
-  //       }
-  //     }
-  //   }
-  // }
-  // .tool {
-  //   .iconfont {
-  //     font-size: 26px;
-  //     margin: 0 15px;
-  //     cursor: pointer
-  //     &:active {
-  //       opacity: 0.7;
-  //     }
-  //     &.icon-like {
-  //       font-size: 26px;
-  //     }
-  //   }
-  // }
-  .lyric-box {
+  .playlist-box {
     width: 345px;
     height: 550px;
     position: absolute;
@@ -752,30 +770,6 @@ export default {
         cursor: pointer;
       }
     }
-    .lyric {
-      display: inline-block;
-      vertical-align: top;
-      width: 100%;
-      height: 430px;
-      overflow: hidden
-      .lyric-wrapper {
-        width: 100%
-        margin: 0 auto
-        overflow: hidden
-        .lyric-text {
-          margin: 5px 0;
-          line-height: 24px;
-          font-size: 14px;
-          font-weight: 300;
-          &.active {
-            color: $color-theme;
-          }
-        }
-      }
-    }
-  }
-  .playlist-box {
-    width: 345px;
     .list {
       overflow-y: scroll;
       max-height: calc(100% - 90px);

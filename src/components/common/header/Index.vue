@@ -23,6 +23,9 @@
         <li>
           <router-link :to="{ name: 'mv' }" tag="a">MV</router-link>
         </li>
+        <li>
+          <a href="https://gitee.com/lxhcool" target="_blank">GITEE</a>
+        </li>
       </ul>
       <div class="search" @click="openSearchPop">
         <i class="iconfont nicesearch-o"></i>
@@ -235,7 +238,7 @@ export default {
   width: 100%;
   height: 64px;
   transition: all 400ms ease-in-out;
-  background-color: #fff;
+  background: rgba(255, 255, 255, 1);
   position: fixed;
   top: 0;
   left: 0;
@@ -255,7 +258,7 @@ export default {
       background-position: 0px center;
       background-repeat: no-repeat;
       background-size: 146px 26px;
-      background-image: url('../../../assets/images/logo_black.png');
+      background-image: url('../../../assets/images/logo.png');
     }
 
     img {
@@ -291,6 +294,9 @@ export default {
             margin: 0 auto;
             opacity: 1;
           }
+        }
+        &:hover {
+          color: #fa2800;
         }
       }
     }
