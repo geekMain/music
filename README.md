@@ -4,10 +4,10 @@
 [Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
 ## 预览地址
-[vue-desktop-nicemusic](https://nicemusic-desktop.lxhcool.cn)
+[vue-desktop-nicemusic](https://lxhcool.cn)
 
 ## 预览地址2
-[vue-desktop-nicemusic](http://nicenav.cn/desktop-music)
+[vue-desktop-nicemusic](https://nicemusic-desktop.lxhcool.cn)
 
 ##### 登录
 ![Image text](https://image-static.segmentfault.com/186/150/1861508309-5f2a2058d2596)
