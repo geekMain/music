@@ -1,7 +1,7 @@
 <template>
   <transition name="slide-fade">
     <div class="player-bar flex-row" v-show="playList.length > 0">
-      <div class="container" style="z-index: 30;">
+      <div class="container" style="z-index: 30">
         <div class="wrapper flex-row">
           <div class="left flex-row">
             <div class="player-btn">
@@ -17,7 +17,6 @@
               class="cover"
               :src="currentSong.image ? currentSong.image : defaultCover"
               alt="nicemusic"
-              @click="toPlayer(currentSong)"
             />
             <div class="info">
               {{ currentLyricTxt }}
@@ -30,9 +29,7 @@
                   {{ formatTime(currentTime) }} /
                   {{ formatTime(currentSong.duration) }}
                 </p>
-                <p class="time" v-else>
-                  00:00 / 00:00
-                </p>
+                <p class="time" v-else>00:00 / 00:00</p>
               </div>
               <div class="progress-wrap flex-row">
                 <a-slider
@@ -92,11 +89,11 @@
                       utils.formatZero(index + 1, 2)
                     }}</span>
                     <div class="play-icon">
-                      <div class="line" style="animation-delay: -1.2s;"></div>
+                      <div class="line" style="animation-delay: -1.2s"></div>
                       <div class="line"></div>
-                      <div class="line" style="animation-delay: -1.5s;"></div>
-                      <div class="line" style="animation-delay: -0.9s;"></div>
-                      <div class="line" style="animation-delay: -0.6s;"></div>
+                      <div class="line" style="animation-delay: -1.5s"></div>
+                      <div class="line" style="animation-delay: -0.9s"></div>
+                      <div class="line" style="animation-delay: -0.6s"></div>
                     </div>
                     <i
                       class="iconfont nicebofang2 play-btn"
@@ -179,11 +176,11 @@ export default {
       volumeNum: 50,
       percent: 0,
       defaultCover: require('../../../assets/images/cd.png'),
-      progressState: false
+      progressState: false,
     }
   },
   components: {
-    NLyric
+    NLyric,
   },
   computed: {
     // 播放暂停按钮
@@ -210,8 +207,8 @@ export default {
       'currentIndex',
       'mode',
       'sequenceList',
-      'historyList'
-    ])
+      'historyList',
+    ]),
   },
   watch: {
     // 监听歌曲内容变化
@@ -257,7 +254,7 @@ export default {
           isPlaying ? audio.play() : audio.pause()
         }
       })
-    }
+    },
   },
   methods: {
     // 清空历史播放列表
@@ -273,7 +270,7 @@ export default {
     playSong(item, index) {
       this.selectPlay({
         list: this.historyList,
-        index
+        index,
       })
     },
     // 停止播放歌曲
@@ -497,7 +494,7 @@ export default {
     },
     // 重置当前播放歌曲序号
     resetCurrentIndex(list) {
-      let index = list.findIndex(item => {
+      let index = list.findIndex((item) => {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
@@ -515,32 +512,31 @@ export default {
       this.$router.push({
         name: 'player',
         query: {
-          id: song.id
-        }
+          id: song.id,
+        },
       })
     },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
       setPlayMode: 'SET_PLAY_MODE',
-      setPlayList: 'SET_PLAYLIST'
+      setPlayList: 'SET_PLAYLIST',
     }),
     ...mapActions([
       'saveHistoryList',
       'deleteHistoryList',
       'clearHistoryList',
       'selectPlay',
-      'pausePlay'
-    ])
+      'pausePlay',
+    ]),
   },
   created() {},
   mounted() {
     console.log(this.historyList)
-  }
+  },
 }
 </script>
 <style lang="stylus" scoped>
-
 .slide-fade-enter-active {
   transition: all 0.5s ease;
 }
@@ -549,8 +545,7 @@ export default {
   transition: all 0.3s cubic-bezier(0.5, 0.3, 0.2, 0.5);
 }
 
-.slide-fade-enter,
-.slide-fade-leave-to {
+.slide-fade-enter, .slide-fade-leave-to {
   opacity: 0;
   transform: translateY(30px);
 }
@@ -558,32 +553,35 @@ export default {
 .player-bar {
   width: 100%;
   height: 72px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(255, 255, 255, 0.95);
   position: fixed;
   bottom: 0;
   right: 0;
   left: 0;
-  z-index: 2001;
+  z-index: 1001;
   padding: 0 10px 0 20px;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
   -ms-flex-pack: justify;
   justify-content: space-between;
   padding-left: calc(100vw - 100%);
+
   .player-page {
     width: 100%;
     height: 100vh;
-    background: rgba(255,255,255,1);
+    background: rgba(255, 255, 255, 1);
     position: fixed;
     top: 0px;
     left: 0;
     padding-top: 100px;
+
     .container {
       display: flex;
-      .page-left,
-      .page-right {
+
+      .page-left, .page-right {
         width: 50%;
       }
+
       .cover-image {
         width: 400px;
         height: 400px;
@@ -610,7 +608,7 @@ export default {
           height: 100%;
           z-index: 1;
           transition: all cubic-bezier(0.4, 0, 0.2, 1) 0.8s 0.5s;
-          background: transparent url('../../../assets/images/cd-wrap.png') center no-repeat;
+          // background: transparent url('../../../assets/images/cd-wrap.png') center no-repeat;
           background-size: contain;
         }
 
@@ -630,13 +628,15 @@ export default {
           font-size: 24px;
           font-weight: bold;
           margin-bottom: 10px;
+
           .iconfont {
             font-size: 35px;
             color: #888;
             cursor: pointer;
-            transform: rotate(90deg)
+            transform: rotate(90deg);
           }
         }
+
         .lyric-wrap {
           width: 100%;
           height: 480px;
@@ -649,29 +649,35 @@ export default {
       }
     }
   }
+
   .left {
     margin-right: 20px;
+
     .player-btn {
       height: 40px;
       display: flex;
       align-items: center;
+
       i {
         cursor: pointer;
+
         &:active {
           opacity: 0.8;
         }
       }
-      .icon-prev,
-      .icon-next {
+
+      .icon-prev, .icon-next {
         font-size: 20px;
         color: #fa2800;
       }
+
       .icon-play {
         width: 43px;
         height: 43px;
         background: linear-gradient(110deg, #fa2800, #fb8974);
         border-radius: 50%;
         margin: 0 26px;
+
         i {
           font-size: 22px;
           color: #ffffff;
@@ -679,12 +685,14 @@ export default {
       }
     }
   }
+
   .center {
     height: 72px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex: 1;
+
     .cover {
       width: 50px;
       height: 50px;
@@ -692,6 +700,7 @@ export default {
       border-radius: 4px;
       cursor: pointer;
     }
+
     .info {
       width: 100%;
       margin: 0 20px 0 10px;
@@ -699,10 +708,12 @@ export default {
       flex-direction: column;
       justify-content: center;
       height: 72px;
+
       .name {
         font-size: 13px;
         font-weight: bold;
         margin-right: 10px;
+
         span {
           font-size: 12px;
           color: #888888;
@@ -711,31 +722,39 @@ export default {
         }
       }
     }
+
     .progress-wrap {
       width: 100%;
+
       span {
         font-size: 14px;
       }
+
       .ant-slider {
         margin: 15px 5px 0 5px;
       }
     }
   }
+
   .right {
     height: 72px;
+
     .volume-icon {
       font-size: 23px;
       font-weight: 700;
       cursor: pointer;
       margin-right: 10px;
     }
+
     .volume-wrap {
       width: 150px;
       margin-right: 10px;
+
       .ant-slider {
         margin-top: 9px;
       }
     }
+
     .tool {
       i {
         font-size: 26px;
@@ -744,6 +763,7 @@ export default {
       }
     }
   }
+
   .playlist-box {
     width: 345px;
     height: 550px;
@@ -752,51 +772,62 @@ export default {
     bottom: 30px;
     border-radius: 3px;
     padding: 30px;
-    overflow: hidden
+    overflow: hidden;
+
     .title {
       margin: 10px 0 20px;
       font-weight: 500;
       font-size: 16px;
+
       i {
         font-size: 20px;
         cursor: pointer;
+
         &:hover {
           color: $color-theme;
         }
       }
+
       .clearBtn {
         font-size: 16px;
         color: $color-theme;
         cursor: pointer;
       }
     }
+
     .list {
       overflow-y: scroll;
       max-height: calc(100% - 90px);
+
       .item {
         padding: 8px 0;
         height: 40px;
+
         .index-container {
           width: 30px;
           margin-right: 20px;
           flex-shrink: 0;
+
           .num {
             font-size: 14px;
             color: #4a4a4a;
           }
+
           .play-icon {
             display: none;
             height: 16px;
             min-width: 18px;
             overflow: hidden;
+
             .line {
               width: 2px;
               height: 100%;
               margin-left: 2px;
               background-color: #ff410f;
-              animation: play .9s linear infinite alternate;
+              animation: play 0.9s linear infinite alternate;
             }
           }
+
           .play-btn {
             color: $color-theme;
             font-size: 28px;
@@ -804,6 +835,7 @@ export default {
             text-align: left;
             cursor: pointer;
           }
+
           .pause-btn {
             color: $color-theme;
             font-size: 30px;
@@ -812,57 +844,71 @@ export default {
             cursor: pointer;
           }
         }
+
         p {
           cursor: pointer;
           flex: 1;
           margin-right: 20px;
+
           &.active {
             color: $color-theme;
           }
         }
+
         i {
           font-size: 20px;
           cursor: pointer;
+
           &:hover {
             color: $color-theme;
           }
         }
+
         &.playing {
           p {
             color: $color-theme;
           }
+
           i {
             color: $color-theme;
           }
+
           .index-container {
             .num {
               display: none;
             }
+
             .play-icon {
               display: flex;
             }
+
             .play-btn {
               display: none;
             }
           }
         }
+
         &:hover {
           .index-container {
             .num {
               display: none;
             }
+
             .play-btn {
               display: block;
             }
           }
+
           &.playing {
             .index-container {
               .play-btn {
                 display: none;
               }
+
               .play-icon {
                 display: none;
               }
+
               .pause-btn {
                 display: block;
               }
