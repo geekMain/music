@@ -37,6 +37,7 @@ instance.interceptors.response.use(
   response => {
     let data = response.data
     let status = response.status
+    console.log(data.msg)
     if (status === 200) {
       return Promise.resolve(data)
     } else if (status === 301) {
@@ -45,6 +46,8 @@ instance.interceptors.response.use(
         path: 'login'
       })
       return
+    } else if (status === 400) {
+      Message.error({ message: data.msg })
     } else {
       return Promise.reject(response)
     }

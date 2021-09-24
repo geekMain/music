@@ -29,7 +29,7 @@
           <div
             class="background layer"
             :style="{
-              backgroundImage: 'url(' + userProfile.backgroundUrl + ')'
+              backgroundImage: 'url(' + userProfile.backgroundUrl + ')',
             }"
           ></div>
           <div class="card flex-row">
@@ -41,6 +41,7 @@
               <div v-if="userInfo.userId === userProfile.userId">
                 <button
                   class="sign-btn sign-btn-active"
+                  @click="sign"
                   v-if="!userDetail.pcSign"
                 >
                   签到
@@ -71,8 +72,8 @@
               ></i>
             </div>
             <div class="tag">
-              地区：
-              <span>{{ provinceName }} - {{ cityName }}</span>
+              <font class="flex-shrink">签名：</font>
+              <span class="ellipsis">{{ userProfile.signature }}</span>
             </div>
           </div>
           <ul class="follow">
@@ -131,18 +132,18 @@ export default {
       type: 1,
       userDetail: {},
       userProfile: {},
-      isPerson: true
+      isPerson: true,
     }
   },
   components: {
     ArtistList,
-    songSheet
+    songSheet,
   },
   computed: {
     ...mapGetters(['userInfo']),
     age() {
       return this.utils.getAstro(this.userInfo.birthday)
-    }
+    },
   },
   watch: {
     $route(newVal, oldVal) {
@@ -153,7 +154,7 @@ export default {
         this.getUserDetail(this.userInfo.userId)
       }
       this._initialize()
-    }
+    },
   },
   methods: {
     // 获取省市
@@ -164,22 +165,23 @@ export default {
             key: '0f57ee7d5045187c48cd268f9d19d815',
             keywords: this.userProfile.province,
             subdistrict: 1,
-            extensions: 'base'
-          }
+            extensions: 'base',
+          },
         })
-        .then(response => {
+        .then((response) => {
+          console.log(response)
           if (response.data.status == 1 && response.data.info == 'OK') {
             let districts = response.data.districts[0]
             let subDistricts = response.data.districts[0].districts
             this.provinceName = districts.name
-            subDistricts.map(item => {
+            subDistricts.map((item) => {
               if (item.adcode == this.userProfile.city) {
                 this.cityName = item.name
               }
             })
           }
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log(error)
         })
     },
@@ -227,7 +229,7 @@ export default {
           let list = res.playlist
           let myList = []
           let collectList = []
-          list.map(item => {
+          list.map((item) => {
             if (item.userId === this.userProfile.userId) {
               myList.push(item)
             } else {
@@ -241,6 +243,17 @@ export default {
         console.log(error)
       }
     },
+    // 签到
+    async sign() {
+      let res = await this.$api.userSign()
+      if (res.code === 200) {
+        this.$message({
+          message: '签到成功',
+          type: 'success',
+        })
+        this.userDetail.pcSign = true
+      }
+    },
     // 初始化
     _initialize() {
       this.getArea()
@@ -250,7 +263,7 @@ export default {
     // 处理歌曲
     _normalizeSongs(list) {
       let ret = []
-      list.map(item => {
+      list.map((item) => {
         item.song.playCount = item.playCount
         item.song.score = item.score
         if (item.song.id) {
@@ -258,7 +271,7 @@ export default {
         }
       })
       return ret
-    }
+    },
   },
   created() {},
   mounted() {
@@ -268,72 +281,85 @@ export default {
     } else {
       this.getUserDetail(this.userInfo.userId)
     }
-  }
+  },
 }
 </script>
 <style lang="stylus" scoped>
 .personal-wrap {
   margin-top: -20px;
+
   .banner {
     width: 100%;
     height: 350px;
-    background: url(../../assets/images/personal.jpg);
+    background: url('../../assets/images/personal.jpg');
     background-position: center;
     background-size: cover;
     background-attachment: fixed;
   }
+
   .personal-main {
     display: flex;
     align-items: flex-start;
+
     .left {
       width: 340px;
       position: relative;
       // top: -60px;
       margin-top: 40px;
       flex-shrink: 0;
+
       .user-box {
         background: #fff;
         border-radius: 5px;
         padding-bottom: 30px;
+
         .background {
           width: 100%;
           height: 140px;
           position: relative;
           border-radius: 5px 5px 0 0;
           background-size: cover;
+
           &::before {
             border-radius: 5px 5px 0 0;
           }
         }
+
         .card {
           margin-top: -20px;
           padding: 0 15px 0 30px;
           width: 100%;
+
           .avatar {
             width: 64px;
             height: 64px;
             flex-shrink: 0;
             z-index: 2;
             position: relative;
+
             img {
               width: 64px;
               height: 64px;
               border-radius: 3px;
             }
           }
+
           .info {
             width: 100%;
             padding-top: 20px;
             margin-left: 15px;
+
             .name {
               font-weight: 600;
               font-size: 16px;
             }
+
             .sign-btn {
               padding: 3px 15px;
               font-size: 12px;
               color: #fff;
               border-radius: 30px;
+
               &.sign-btn-active {
                 background: #fa2800;
                 cursor: pointer;
@@ -342,15 +368,18 @@ export default {
             }
           }
         }
+
         .desc {
           padding: 0 40px;
           font-size: 13px;
           margin-top: 10px;
           color: #666;
         }
+
         .profile {
           padding: 0 40px;
           margin-top: 10px;
+
           .tag {
             position: relative;
             font-size: 13px;
@@ -358,29 +387,36 @@ export default {
             display: flex;
             align-items: center;
             margin-bottom: 5px;
+
             .lv-icon {
               font-size: 22px;
               position: relative;
               top: 1px;
             }
+
             .sex-icon {
               font-size: 14px;
               margin-left: 5px;
               font-weight: bold;
+
               &.men {
                 color: #4192eb;
               }
+
               &.women {
                 color: #f4606c;
               }
             }
+
             .area-icon {
               font-size: 12px;
               margin-right: 5px;
             }
+
             span {
               font-size: 13px;
             }
+
             &::before {
               content: '';
               width: 6px;
@@ -394,6 +430,7 @@ export default {
             }
           }
         }
+
         .follow {
           list-style: none;
           display: flex;
@@ -401,20 +438,24 @@ export default {
           margin-top: 15px;
           padding-top: 15px;
           border-top: 1px solid #f9f9ff;
+
           li {
             width: 33%;
             text-align: center;
             font-size: 14px;
             color: #958ebb;
+
             span {
               display: block;
             }
           }
         }
+
         .foot {
           width: 100%;
           padding: 0 30px;
           margin-top: 30px;
+
           a {
             display: block;
             width: 50%;
@@ -430,6 +471,7 @@ export default {
         }
       }
     }
+
     .center {
       // width: 640px;
       flex: 1;
@@ -439,25 +481,30 @@ export default {
       margin-right: 20px;
       border-radius: 5px;
       padding: 15px;
+
       .card-header {
         border-left: 3px solid $color-theme;
         height: 20px;
         padding-left: 1rem;
         margin-bottom: 15px;
         font-weight: bold;
+
         span {
           font-weight: 100;
           color: #666666;
           font-size: 12px;
         }
+
         .tab {
           span {
             font-size: 12px;
             cursor: pointer;
+
             &.active {
               color: $color-theme;
             }
           }
+
           .line {
             width: 1px;
             height: 13px;
@@ -468,6 +515,7 @@ export default {
         }
       }
     }
+
     .right {
       width: 340px;
       flex-shrink: 0;
@@ -476,35 +524,43 @@ export default {
       position: relative;
       padding-bottom: 30px;
       margin-top: 20px;
+
       .card-header {
         border-left: 3px solid $color-theme;
         height: 20px;
         padding-left: 1rem;
         margin-bottom: 15px;
         font-weight: bold;
+
         .icon-like {
           font-size: 20px;
         }
       }
+
       .module {
         padding: 15px;
         width: 100%;
         border-radius: 8px;
         margin-bottom: 20px;
       }
+
       .my {
         padding-bottom: 5px;
+
         ul {
           display: flex;
           flex-wrap: wrap;
           margin: 0 -5px;
+
           li {
             flex: 0 0 14.285714285714%;
             max-width: 14.285714285714%;
             padding: 0 5px 10px;
+
             .avatar {
               width: 100%;
               border-radius: 3px;
+
               img {
                 width: 100%;
                 border-radius: 3px;

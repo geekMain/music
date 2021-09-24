@@ -31,5 +31,12 @@ export const getUserRecord = (uid, type) =>
 
 export const getUserArtist = uid => api.get(`/user/playlist?uid=${uid}`, {})
 
+/**
+ * @method 获取用户播放记录
+ * @params type 默认 0, 其中 0 为安卓端签到 ,1 为 web/PC 签到
+ * */
+
+export const userSign = () => api.get(`/daily_signin?type=1`, {})
+
 // 退出登录
 export const logout = () => api.get(`/logout`, {})
