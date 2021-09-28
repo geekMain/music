@@ -3,6 +3,9 @@
 ## 感谢
 [Binaryify/NeteaseCloudMusicApi](https://github.com/Binaryify/NeteaseCloudMusicApi)
 
+## 若对您有帮助欢迎打赏
+![Image text](https://z3.ax1x.com/2021/09/28/4f8d6H.png)
+
 ## 预览地址
 [vue-desktop-nicemusic](https://lxhcool.cn)
 
