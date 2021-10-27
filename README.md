@@ -6,8 +6,8 @@
 ## 预览地址
 [vue-desktop-nicemusic](https://lxhcool.cn)
 
-## 预览地址2
-[vue-desktop-nicemusic](https://nicemusic-desktop.lxhcool.cn)
+## 若对您有帮助欢迎打赏
+![Image text](https://z3.ax1x.com/2021/09/28/4f8d6H.png)
 
 ##### 登录
 ![Image text](https://image-static.segmentfault.com/186/150/1861508309-5f2a2058d2596)
