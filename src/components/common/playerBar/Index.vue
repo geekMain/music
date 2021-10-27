@@ -176,11 +176,11 @@ export default {
       volumeNum: 50,
       percent: 0,
       defaultCover: require('../../../assets/images/cd.png'),
-      progressState: false,
+      progressState: false
     }
   },
   components: {
-    NLyric,
+    NLyric
   },
   computed: {
     // 播放暂停按钮
@@ -207,8 +207,8 @@ export default {
       'currentIndex',
       'mode',
       'sequenceList',
-      'historyList',
-    ]),
+      'historyList'
+    ])
   },
   watch: {
     // 监听歌曲内容变化
@@ -254,7 +254,7 @@ export default {
           isPlaying ? audio.play() : audio.pause()
         }
       })
-    },
+    }
   },
   methods: {
     // 清空历史播放列表
@@ -270,7 +270,7 @@ export default {
     playSong(item, index) {
       this.selectPlay({
         list: this.historyList,
-        index,
+        index
       })
     },
     // 停止播放歌曲
@@ -494,7 +494,7 @@ export default {
     },
     // 重置当前播放歌曲序号
     resetCurrentIndex(list) {
-      let index = list.findIndex((item) => {
+      let index = list.findIndex(item => {
         return item.id === this.currentSong.id
       })
       this.setCurrentIndex(index)
@@ -512,28 +512,28 @@ export default {
       this.$router.push({
         name: 'player',
         query: {
-          id: song.id,
-        },
+          id: song.id
+        }
       })
     },
     ...mapMutations({
       setPlayingState: 'SET_PLAYING_STATE',
       setCurrentIndex: 'SET_CURRENT_INDEX',
       setPlayMode: 'SET_PLAY_MODE',
-      setPlayList: 'SET_PLAYLIST',
+      setPlayList: 'SET_PLAYLIST'
     }),
     ...mapActions([
       'saveHistoryList',
       'deleteHistoryList',
       'clearHistoryList',
       'selectPlay',
-      'pausePlay',
-    ]),
+      'pausePlay'
+    ])
   },
   created() {},
   mounted() {
     console.log(this.historyList)
-  },
+  }
 }
 </script>
 <style lang="stylus" scoped>
@@ -608,7 +608,7 @@ export default {
           height: 100%;
           z-index: 1;
           transition: all cubic-bezier(0.4, 0, 0.2, 1) 0.8s 0.5s;
-          // background: transparent url('../../../assets/images/cd-wrap.png') center no-repeat;
+          background: transparent url('../../../assets/images/cd-wrap.png') center no-repeat;
           background-size: contain;
         }
 
