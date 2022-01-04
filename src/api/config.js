@@ -1,7 +1,7 @@
 let api_base_url = ''
 
 if (process.env.NODE_ENV === 'development') {
-  api_base_url = 'http://localhost:3000'
+  api_base_url = 'https://netease-cloud-music-api-hazel-tau.vercel.app/'
 } else if (process.env.NODE_ENV === 'production') {
   api_base_url = 'https://nicemusic-api.lxhcool.cn/'
 }
