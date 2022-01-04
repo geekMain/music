@@ -1,4 +1,4 @@
-let api_base_url = 'https://netease-cloud-music-api-hazel-tau.vercel.app'
+let api_base_url = ''
 
 if (process.env.NODE_ENV === 'development') {
   api_base_url = 'https://netease-cloud-music-api-hazel-tau.vercel.app'
